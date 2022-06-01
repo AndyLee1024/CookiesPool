@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     hostname: server
+    working_dir: /home
     ports:
       - "5022:5000"
     volumes:
