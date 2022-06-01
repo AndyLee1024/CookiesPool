@@ -122,7 +122,7 @@ def get_trajectory_1(distance):
 
 async def get_xiaohongshu_cookie(username, password):
     test_url = 'https://www.xiaohongshu.com/discovery/item/628b664800000000010263f5'
-    browser = await launch(headless=False, defaultViewport=None,
+    browser = await launch(headless=True, defaultViewport=None,
                            ignoreDefaultArgs=[
                                '--enable-automation'
                            ],
@@ -213,4 +213,4 @@ async def slide(pageObject, captchaObject):
 
 
 if __name__ == '__main__':
-    asyncio.run(get_xiaohongshu_cookie())
+    asyncio.run(get_xiaohongshu_cookie('test', 'test'))
