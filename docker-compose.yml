@@ -27,7 +27,7 @@ services:
       - back-tier
     environment:
       - REDIS_PASSWORD=polkjhguDNJHD2
-    command: [ "redis-server", "--requirepass", "$REDIS_PASSWORD" ]
+    command: [ "redis-server", "--requirepass", "polkjhguDNJHD2" ]
     volumes:
       - redis_storage:/data/redis-data
     restart: always
