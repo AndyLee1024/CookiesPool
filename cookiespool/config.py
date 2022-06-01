@@ -18,20 +18,17 @@ BROWSER_TYPE = 'Chromium'
 
 # 产生器类，如扩展其他站点，请在此配置
 GENERATOR_MAP = {
-    'weibo': 'WeiboCookiesGenerator',
     'xiaohongshu': 'XiaohongshuCookiesGenerator',
 }
 
 # 测试类，如扩展其他站点，请在此配置
 TESTER_MAP = {
-    'weibo': 'WeiboValidTester',
     'xiaohongshu': 'XiaohongshuValidTester'
 }
 
 PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS')
 
 TEST_URL_MAP = {
-    'weibo': 'https://m.weibo.cn/',
     'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628b664800000000010263f5'
 }
 
