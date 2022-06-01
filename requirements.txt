@@ -2,3 +2,6 @@ requests>=2.13.0
 selenium>=3.4.0
 redis>=2.10.5
 Flask>=0.12.1
+random_user_agent==1.0.1
+pyppeteer==1.0.2
+ddddocr==1.4.3

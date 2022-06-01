@@ -1,9 +1,10 @@
+import asyncio
 import json
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
 from cookiespool.config import *
 from cookiespool.db import RedisClient
-from login.weibo.cookies import WeiboCookies
+from login.xiaohongshu.cookies import get_xiaohongshu_cookie
 
 
 class CookiesGenerator(object):
@@ -13,28 +14,11 @@ class CookiesGenerator(object):
         :param website: 名称
         :param browser: 浏览器, 若不使用浏览器则可设置为 None
         """
+        self.browser = None
         self.website = website
         self.cookies_db = RedisClient('cookies', self.website)
         self.accounts_db = RedisClient('accounts', self.website)
-        self.init_browser()
 
-    def __del__(self):
-        self.close()
-    
-    def init_browser(self):
-        """
-        通过browser参数初始化全局浏览器供模拟登录使用
-        :return:
-        """
-        if BROWSER_TYPE == 'PhantomJS':
-            caps = DesiredCapabilities.PHANTOMJS
-            caps[
-                "phantomjs.page.settings.userAgent"] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
-            self.browser = webdriver.PhantomJS(desired_capabilities=caps)
-            self.browser.set_window_size(1400, 500)
-        elif BROWSER_TYPE == 'Chrome':
-            self.browser = webdriver.Chrome()
-    
     def new_cookies(self, username, password):
         """
         新生成Cookies，子类需要重写
@@ -43,7 +27,7 @@ class CookiesGenerator(object):
         :return:
         """
         raise NotImplementedError
-    
+
     def process_cookies(self, cookies):
         """
         处理Cookies
@@ -54,15 +38,18 @@ class CookiesGenerator(object):
         for cookie in cookies:
             dict[cookie['name']] = cookie['value']
         return dict
-    
+
     def run(self):
         """
         运行, 得到所有账户, 然后顺次模拟登录
         :return:
         """
+
+        print(f'正在生成Cookies, Website is {self.website} browser type is {BROWSER_TYPE}')
+
         accounts_usernames = self.accounts_db.usernames()
         cookies_usernames = self.cookies_db.usernames()
-        
+
         for username in accounts_usernames:
             if not username in cookies_usernames:
                 password = self.accounts_db.get(username)
@@ -83,22 +70,10 @@ class CookiesGenerator(object):
                     print(result.get('content'))
         else:
             print('所有账号都已经成功获取Cookies')
-    
-    def close(self):
-        """
-        关闭
-        :return:
-        """
-        try:
-            print('Closing Browser')
-            self.browser.close()
-            del self.browser
-        except TypeError:
-            print('Browser not opened')
 
 
-class WeiboCookiesGenerator(CookiesGenerator):
-    def __init__(self, website='weibo'):
+class XiaohongshuCookiesGenerator(CookiesGenerator):
+    def __init__(self, website='xiaohongshu'):
         """
         初始化操作
         :param website: 站点名称
@@ -106,7 +81,7 @@ class WeiboCookiesGenerator(CookiesGenerator):
         """
         CookiesGenerator.__init__(self, website)
         self.website = website
-    
+
     def new_cookies(self, username, password):
         """
         生成Cookies
@@ -114,9 +89,9 @@ class WeiboCookiesGenerator(CookiesGenerator):
         :param password: 密码
         :return: 用户名和Cookies
         """
-        return WeiboCookies(username, password, self.browser).main()
+        return asyncio.run(get_xiaohongshu_cookie(username, password))
 
 
 if __name__ == '__main__':
-    generator = WeiboCookiesGenerator()
+    generator = XiaohongshuCookiesGenerator()
     generator.run()
