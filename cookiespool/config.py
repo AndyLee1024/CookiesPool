@@ -1,17 +1,17 @@
 import os
 
 # Redis数据库地址
-REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_HOST = os.environ.get('REDIS_HOST', '124.220.177.240')
 
 # 目前支持的平台类型
 
 PLATFORM = ['weibo', 'xiaohongshu', 'toutiao', 'zhihu', 'baidu']
 
 # Redis端口
-REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_PORT = os.environ.get('REDIS_PORT', '33479')
 
 # Redis密码，如无填None
-REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', 'eYVX7mxKPCDmwMtyKVge8oLd2t81')
 
 # 产生器使用的浏览器
 BROWSER_TYPE = 'Chromium'
@@ -26,7 +26,7 @@ TESTER_MAP = {
     'xiaohongshu': 'XiaohongshuValidTester'
 }
 
-PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS')
+PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS', 'http://124.220.177.240:8425/random')
 
 TEST_URL_MAP = {
     'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628b664800000000010263f5'
