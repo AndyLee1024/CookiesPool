@@ -1,20 +1,13 @@
 import asyncio
 import os
-import uuid
-
 from pyppeteer import launch
 import ddddocr
-import shutil
-import requests
-import mimetypes
 import random
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, OperatingSystem
-
-proxypool_url = 'http://124.220.177.240:8425/random'
+from cookiespool.libs import get_random_proxy, download_image, get_trajectory_1, get_user_agent
+from cookiespool.config import TEST_URL_MAP
 
 HIDE_WEBDRIVER = '''() => {Object.defineProperty(navigator, 'webdriver', {get: () => undefined})}'''
-SET_USER_AGENT = '''() => {Object.defineProperty(navigator, 'userAgent', {get: () => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'})}'''
+SET_USER_AGENT = '''() => {Object.defineProperty(navigator, 'userAgent', {get: () => '%s'})}'''
 SET_APP_VERSION = '''() => {Object.defineProperty(navigator, 'appVersion', {get: () => '5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'})}'''
 EXTEND_LANGUAGES = '''() => {Object.defineProperty(navigator, 'languages', {get: () => ['zh-CN', 'zh', 'en', 'zh-TW', 'ja']})}'''
 EXTEND_PLUGINS = '''() => {Object.defineProperty(navigator, 'plugins', {get: () => [0, 1, 2, 3, 4]})}'''
@@ -85,43 +78,7 @@ CHANGE_PERMISSION = '''() => {
 '''
 
 
-def get_random_proxy():
-    """
-    :return: proxy
-    """
-    proxy = requests.get(proxypool_url).text.strip()
-    print('http://{}'.format(proxy))
-    return proxy
-
-
-def download_image(url):
-    response = requests.get(url, stream=True)
-    content_type = response.headers['content-type']
-    extension = mimetypes.guess_extension(content_type)
-    name = str(uuid.uuid1())
-    filename = '{}.{}'.format(name, extension)
-    with open(filename, 'wb') as out_file:
-        shutil.copyfileobj(response.raw, out_file)
-    return filename
-
-
-def get_trajectory_1(distance):
-    ge = [[0, 0, 0]]
-    for i in range(10):
-        x = 0
-        y = random.randint(-1, 1)
-        t = 100 * (i + 1) + random.randint(0, 2)
-        ge.append([x, y, t])
-    for items in ge[1:-5]:
-        items[0] = distance // 2
-    for items in ge[-5:-1]:
-        items[0] = distance + random.randint(1, 4)
-    ge[-1][0] = distance
-    return ge, ge[-1][2]
-
-
 async def get_xiaohongshu_cookie(username, password):
-    test_url = 'https://www.xiaohongshu.com/discovery/item/628b664800000000010263f5'
     browser = await launch(headless=True, defaultViewport=None,
                            ignoreDefaultArgs=[
                                '--enable-automation'
@@ -132,6 +89,7 @@ async def get_xiaohongshu_cookie(username, password):
                                  '--password-store=basic',
                                  '--account-consistency',
                                  '--aggressive',
+                                 '--proxy-server={}'.format(get_random_proxy()),
                                  '--allow-running-insecure-content',
                                  '--allow-no-sandbox-job',
                                  '--allow-outdated-plugins',
@@ -139,7 +97,7 @@ async def get_xiaohongshu_cookie(username, password):
     context = await browser.createIncognitoBrowserContext()
     page = await context.newPage()
     await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
-    await page.evaluateOnNewDocument(SET_USER_AGENT)
+    await page.evaluateOnNewDocument(SET_USER_AGENT % get_user_agent(1))
     await page.evaluateOnNewDocument(SET_APP_VERSION)
     await page.evaluateOnNewDocument(EXTEND_LANGUAGES)
     await page.evaluateOnNewDocument(EXTEND_PLUGINS)
@@ -148,24 +106,30 @@ async def get_xiaohongshu_cookie(username, password):
     await page.evaluateOnNewDocument(SET_CHROME_INFO)
     await page.evaluateOnNewDocument(CHANGE_PERMISSION)
 
-    await page.goto(test_url)
-    await page.waitForNavigation({'waitUntil': 'networkidle2'})
+    await page.goto(TEST_URL_MAP.get('xiaohongshu'))
 
     for i in range(0, 5):
+        print(page.url)
+        await page.waitFor(5000)
+
         captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
-        print(captcha)
-        if captcha:
+
+        print(f'captcha status {captcha}')
+        if captcha is None:
+            break
+        else:
             await slide(page, captcha)
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
+
     current_url = page.url
     result = {
         'status': 2
     }
     if current_url.find('captcha') == -1:
-        print('Successful to get cookies')
         result['status'] = 1
         result['content'] = await page.cookies()
     await browser.close()
+    print('Successful to get cookies', result)
     return result
 
 
