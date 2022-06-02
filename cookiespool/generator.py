@@ -51,27 +51,27 @@ class CookiesGenerator(object):
         cookies_usernames = self.cookies_db.usernames()
 
         if len(accounts_usernames) == 0:
-            print('没有账号密码，无法进行cookies 生成')
+            print('没有账号密码，无法进行cookies 生成', flush=True)
         else:
             for username in accounts_usernames:
                 if not username in cookies_usernames:
                     password = self.accounts_db.get(username)
-                    print('正在生成Cookies', '账号', username, '密码', password)
+                    print('正在生成Cookies', '账号', username, '密码', password, flush=True)
                     result = self.new_cookies(username, password)
                     # 成功获取
                     if result.get('status') == 1:
                         cookies = self.process_cookies(result.get('content'))
-                        print('成功获取到Cookies', cookies)
+                        print('成功获取到Cookies', cookies, flush=True)
                         if self.cookies_db.set(username, json.dumps(cookies)):
-                            print('成功保存Cookies')
+                            print('成功保存Cookies', flush=True)
                     # 密码错误，移除账号
                     elif result.get('status') == 2:
                         if self.accounts_db.delete(username):
-                            print('成功删除账号')
+                            print('成功删除账号', flush=True)
                     else:
-                        print(result.get('content'))
+                        print(result.get('content'), flush=True)
             else:
-                print('所有账号都已经成功获取Cookies')
+                print('所有账号都已经成功获取Cookies', flush=True)
 
 
 class XiaohongshuCookiesGenerator(CookiesGenerator):
