@@ -37,7 +37,7 @@ CYCLE = 120
 
 # API地址和端口
 API_HOST = '0.0.0.0'
-API_PORT = 5000
+API_PORT = 5022
 
 # 产生器开关，模拟登录添加Cookies
 GENERATOR_PROCESS = True
