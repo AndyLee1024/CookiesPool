@@ -57,6 +57,6 @@ def get_trajectory_1(distance):
 def proxy_wrapper_for_requests():
     proxy = get_random_proxy()
     return {
-        "http": proxy,
-        "https": proxy
+        "http": f'http://{proxy}',
+        "https": f'http://{proxy}'
     }

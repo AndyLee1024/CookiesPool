@@ -95,7 +95,7 @@ class XiaohongshuValidTester(ValidTester):
                     print('Cookies失效', username)
                     self.cookies_db.delete(username)
                     print('删除Cookies', username)
-           
+
             else:
                 print('Cookies失效', username)
                 self.cookies_db.delete(username)
