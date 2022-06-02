@@ -31,7 +31,7 @@ class Scheduler(object):
                     generator = eval(cls + '(website="' + website + '")')
                     generator.run()
                     print('Cookies生成完成')
-                    generator.close()
+                    # generator.close()
                     time.sleep(cycle)
             except Exception as e:
                 print(e.args)

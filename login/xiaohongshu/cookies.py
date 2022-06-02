@@ -1,5 +1,7 @@
 import asyncio
 import os
+import time
+
 from pyppeteer import launch
 import ddddocr
 import random
@@ -79,7 +81,7 @@ CHANGE_PERMISSION = '''() => {
 
 
 async def get_xiaohongshu_cookie(username, password):
-    browser = await launch(headless=True, defaultViewport=None,
+    browser = await launch(headless=False, defaultViewport=None,
                            ignoreDefaultArgs=[
                                '--enable-automation'
                            ],
@@ -123,7 +125,7 @@ async def get_xiaohongshu_cookie(username, password):
 
     current_url = page.url
     result = {
-        'status': 2
+        'status': 3
     }
     if current_url.find('captcha') == -1:
         result['status'] = 1
@@ -174,6 +176,7 @@ async def slide(pageObject, captchaObject):
             await page.mouse.move(trajectory[0] + handleX, trajectory[1] + handleY,
                                   options={'steps': random.randint(10, 30)})
         await page.mouse.up()
+        await asyncio.sleep(1)
 
 
 if __name__ == '__main__':

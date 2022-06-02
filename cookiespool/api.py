@@ -9,7 +9,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return '<h2>Welcome to Cookie Pool System</h2>'
+    return '<h2>Welcome to Cookie Pool System</h2>' \
+
 
 
 def get_conn():
@@ -51,13 +52,23 @@ def add(website, username, password):
     return json.dumps({'status': '1'})
 
 
-@app.route('/<website>/count')
-def count(website):
+@app.route('/<website>/cookie_count')
+def cookie_count(website):
     """
     获取Cookies总数
     """
     g = get_conn()
     count = getattr(g, website + '_cookies').count()
+    return json.dumps({'status': '1', 'count': count})
+
+
+@app.route('/<website>/account_count')
+def account_count(website):
+    """
+    获取Cookies总数
+    """
+    g = get_conn()
+    count = getattr(g, website + '_accounts').count()
     return json.dumps({'status': '1', 'count': count})
 
 

@@ -50,26 +50,28 @@ class CookiesGenerator(object):
         accounts_usernames = self.accounts_db.usernames()
         cookies_usernames = self.cookies_db.usernames()
 
-        for username in accounts_usernames:
-            if not username in cookies_usernames:
-                password = self.accounts_db.get(username)
-                print('正在生成Cookies', '账号', username, '密码', password)
-                result = self.new_cookies(username, password)
-                # 成功获取
-                if result.get('status') == 1:
-                    cookies = self.process_cookies(result.get('content'))
-                    print('成功获取到Cookies', cookies)
-                    if self.cookies_db.set(username, json.dumps(cookies)):
-                        print('成功保存Cookies')
-                # 密码错误，移除账号
-                elif result.get('status') == 2:
-                    print(result.get('content'))
-                    if self.accounts_db.delete(username):
-                        print('成功删除账号')
-                else:
-                    print(result.get('content'))
+        if len(accounts_usernames) == 0:
+            print('没有账号密码，无法进行cookies 生成')
         else:
-            print('所有账号都已经成功获取Cookies')
+            for username in accounts_usernames:
+                if not username in cookies_usernames:
+                    password = self.accounts_db.get(username)
+                    print('正在生成Cookies', '账号', username, '密码', password)
+                    result = self.new_cookies(username, password)
+                    # 成功获取
+                    if result.get('status') == 1:
+                        cookies = self.process_cookies(result.get('content'))
+                        print('成功获取到Cookies', cookies)
+                        if self.cookies_db.set(username, json.dumps(cookies)):
+                            print('成功保存Cookies')
+                    # 密码错误，移除账号
+                    elif result.get('status') == 2:
+                        if self.accounts_db.delete(username):
+                            print('成功删除账号')
+                    else:
+                        print(result.get('content'))
+            else:
+                print('所有账号都已经成功获取Cookies')
 
 
 class XiaohongshuCookiesGenerator(CookiesGenerator):
