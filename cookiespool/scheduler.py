@@ -25,7 +25,7 @@ class Scheduler(object):
     @staticmethod
     def generate_cookie(cycle=CYCLE):
         while True:
-            print('Cookies生成进程开始运行')
+            print('Cookies生成进程开始运行 ->')
             try:
                 for website, cls in GENERATOR_MAP.items():
                     generator = eval(cls + '(website="' + website + '")')

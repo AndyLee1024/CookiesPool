@@ -2,7 +2,6 @@ import requests
 from cookiespool.config import PROXY_POOL_URL
 import uuid
 import mimetypes
-import shutil
 import random
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, OperatingSystem
@@ -29,13 +28,15 @@ def get_random_proxy():
 
 
 def download_image(url):
-    response = requests.get(url, stream=True)
+    response = requests.get(url, headers={'Referer': 'https://www.xiaohongshu.com/',
+                                          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'},
+                            )
     content_type = response.headers['content-type']
     extension = mimetypes.guess_extension(content_type)
     name = str(uuid.uuid1())
-    filename = '{}.{}'.format(name, extension)
+    filename = '{}{}'.format(name, extension)
     with open(filename, 'wb') as out_file:
-        shutil.copyfileobj(response.raw, out_file)
+        out_file.write(response.content)
     return filename
 
 
