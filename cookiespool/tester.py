@@ -2,9 +2,10 @@ import json
 import requests
 from requests.exceptions import ConnectionError
 from cookiespool.db import *
-from cookiespool.libs import proxy_wrapper_for_requests
+from cookiespool.libs import proxy_wrapper_for_requests, get_user_agent
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, OperatingSystem
+from retrying import retry
 
 software_names = [SoftwareName.CHROME.value]
 operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
@@ -16,6 +17,18 @@ user_agents = user_agent_rotator.get_user_agents()
 
 
 # Get Random User Agent String.
+@retry(stop_max_attempt_number=5)
+def send_request(url, headers, cookies):
+    proxy = proxy_wrapper_for_requests()
+    res = requests.get(url, headers, proxies=proxy, cookies=cookies, timeout=5)
+    print('starting test request ..')
+    if res.ok:
+        if response.text.find('datePublished') > -1:
+            return 'cool'
+        else:
+            raise KeyError('cookies has been outdated')
+    else:
+        raise ConnectionRefusedError('something went wrong')
 
 
 class ValidTester(object):
@@ -50,9 +63,13 @@ class WeiboValidTester(ValidTester):
             return
         try:
             test_url = TEST_URL_MAP[self.website]
-            proxy = proxy_wrapper_for_requests()
-            response = requests.get(test_url, proxies=proxy, cookies=cookies, timeout=5, allow_redirects=False)
-            if response.status_code == 200:
+            headers = {
+                'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Referer': 'https://www.xiaohongshu.com/',
+                'User-Agent': get_user_agent(1)
+            }
+            res = send_request(test_url, cookies=cookies, headers=headers)
+            if res == 'cool':
                 print('Cookies有效', username, flush=True)
             else:
                 print(response.status_code, response.headers)
