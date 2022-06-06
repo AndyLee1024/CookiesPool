@@ -108,12 +108,11 @@ async def get_xiaohongshu_cookie(username, password):
     await page.evaluateOnNewDocument(SET_CHROME_INFO)
     await page.evaluateOnNewDocument(CHANGE_PERMISSION)
 
-    # await page.goto(TEST_URL_MAP.get('xiaohongshu'))
-    await page.goto('https://www.xiaohongshu.com/website-login/captcha?redirectPath=http%3A%2F%2Fwww.xiaohongshu.com%2Fdiscovery%2Fitem%2F629abd81000000000102a027')
+    await page.goto(TEST_URL_MAP.get('xiaohongshu'))
 
-    for i in range(0, 5):
+    for i in range(0, 3):
         print(page.url)
-        await page.waitFor(5000)
+        await page.waitFor(3000)
 
         captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
 
