@@ -8,14 +8,25 @@ from random_user_agent.params import SoftwareName, OperatingSystem
 
 
 def get_user_agent(number):
-    software_names = [SoftwareName.CHROME.value]
-    operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
-    user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems, limit=number)
-
+    software_names = [SoftwareName.SAFARI.value, SoftwareName.CHROME.value]
+    operating_systems = [OperatingSystem.IOS, OperatingSystem.ANDROID]
+    user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems, limit=100)
+    print(user_agent_rotator.get_random_user_agent(), user_agent_rotator.get_user_agents())
     if number <= 1:
         return user_agent_rotator.get_random_user_agent()
     else:
         return user_agent_rotator.get_user_agents()
+
+
+def generate_weixin_user_agent():
+    iOS_version_random = random.randint(12, 15)
+    android_version_random = random.randint(8, 12)
+
+    uas = [
+        f'Mozilla/5.0 (iPhone; CPU iPhone OS {iOS_version_random}_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/{iOS_version_random}E148 MicroMessenger/8.0.22(0x1800{iOS_version_random}28) NetType/WIFI Language/zh_CN',
+        f'Mozilla/5.0 (Linux; Android {android_version_random}; M2007J1SC Build/QKQ1.200419.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/3225 MMWEBSDK/20220402 Mobile Safari/537.36 MMWEBID/2728 MicroMessenger/8.0.22.2140(0x2800{android_version_random}F2) WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64'
+    ]
+    return random.choice(uas)
 
 
 def get_random_proxy():

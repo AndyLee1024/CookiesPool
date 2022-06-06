@@ -29,7 +29,7 @@ TESTER_MAP = {
 PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS', 'http://124.220.177.240:8425/random')
 
 TEST_URL_MAP = {
-    'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628b664800000000010263f5'
+    'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/6270b07500000000210371b6?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}'
 }
 
 # 产生器和验证器循环周期
@@ -40,7 +40,7 @@ API_HOST = '0.0.0.0'
 API_PORT = 5022
 
 # 产生器开关，模拟登录添加Cookies
-GENERATOR_PROCESS = False
+GENERATOR_PROCESS = True
 # 验证器开关，循环检测数据库中Cookies是否可用，不可用删除
 VALID_PROCESS = True
 # API接口服务

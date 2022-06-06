@@ -1,7 +1,5 @@
 import asyncio
 import json
-from selenium import webdriver
-from selenium.webdriver import DesiredCapabilities
 from cookiespool.config import *
 from cookiespool.db import RedisClient
 from login.xiaohongshu.cookies import get_xiaohongshu_cookie

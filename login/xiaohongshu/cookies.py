@@ -5,7 +5,7 @@ import time
 from pyppeteer import launch
 import ddddocr
 import random
-from cookiespool.libs import get_random_proxy, download_image, get_trajectory_1, get_user_agent
+from cookiespool.libs import get_random_proxy, download_image, get_trajectory_1, generate_weixin_user_agent
 from cookiespool.config import TEST_URL_MAP
 
 HIDE_WEBDRIVER = '''() => {Object.defineProperty(navigator, 'webdriver', {get: () => undefined})}'''
@@ -81,7 +81,7 @@ CHANGE_PERMISSION = '''() => {
 
 
 async def get_xiaohongshu_cookie(username, password):
-    browser = await launch(headless=False, defaultViewport=None,
+    browser = await launch(headless=True, defaultViewport=None,
                            ignoreDefaultArgs=[
                                '--enable-automation'
                            ],
@@ -99,8 +99,6 @@ async def get_xiaohongshu_cookie(username, password):
     context = await browser.createIncognitoBrowserContext()
     page = await context.newPage()
     await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
-    await page.evaluateOnNewDocument(SET_USER_AGENT % get_user_agent(1))
-    await page.evaluateOnNewDocument(SET_APP_VERSION)
     await page.evaluateOnNewDocument(EXTEND_LANGUAGES)
     await page.evaluateOnNewDocument(EXTEND_PLUGINS)
     await page.evaluateOnNewDocument(EXTEND_MIME_TYPES)
@@ -108,11 +106,14 @@ async def get_xiaohongshu_cookie(username, password):
     await page.evaluateOnNewDocument(SET_CHROME_INFO)
     await page.evaluateOnNewDocument(CHANGE_PERMISSION)
 
-    await page.goto(TEST_URL_MAP.get('xiaohongshu'))
+    await page.emulate(
+        options={'viewport': {'width': 390, 'height': 844, 'isMobile': True},
+                 'userAgent': generate_weixin_user_agent()})
+    await page.goto(TEST_URL_MAP.get('xiaohongshu').format(int(time.time())))
 
-    for i in range(0, 3):
+    for i in range(0, 2):
         print(page.url)
-        await page.waitFor(3000)
+        await asyncio.sleep(4)
 
         captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
 
