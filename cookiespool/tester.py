@@ -30,7 +30,7 @@ class ValidTester(object):
     def run(self):
         cookies_groups = self.cookies_db.all()
         if len(cookies_groups) == 0:
-            print('没有Cookies 无法进行测试')
+            print('没有Cookies 无法进行测试', flush=True)
         for username, cookies in cookies_groups.items():
             self.test(username, cookies)
 
@@ -40,27 +40,26 @@ class WeiboValidTester(ValidTester):
         ValidTester.__init__(self, website)
 
     def test(self, username, cookies):
-        print('正在测试Cookies', '用户名', username)
+        print('正在测试Cookies', '用户名', username, flush=True)
         try:
             cookies = json.loads(cookies)
         except TypeError:
-            print('Cookies不合法', username)
+            print('Cookies不合法', username, flush=True)
             self.cookies_db.delete(username)
-            print('删除Cookies', username)
+            print('删除Cookies', username, flush=True)
             return
         try:
             test_url = TEST_URL_MAP[self.website]
             proxy = proxy_wrapper_for_requests()
             response = requests.get(test_url, proxies=proxy, cookies=cookies, timeout=5, allow_redirects=False)
             if response.status_code == 200:
-                print('Cookies有效', username)
+                print('Cookies有效', username, flush=True)
             else:
-                print(response.status_code, response.headers)
-                print('Cookies失效', username)
+                print('Cookies失效', username, flush=True)
                 self.cookies_db.delete(username)
-                print('删除Cookies', username)
+                print('删除Cookies', username, flush=True)
         except ConnectionError as e:
-            print('发生异常', e.args)
+            print('发生异常', e.args, flush=True)
 
 
 class XiaohongshuValidTester(ValidTester):
@@ -68,13 +67,13 @@ class XiaohongshuValidTester(ValidTester):
         ValidTester.__init__(self, website)
 
     def test(self, username, cookies):
-        print('正在测试Cookies', '用户名', username)
+        print('正在测试Cookies', '用户名', username, flush=True)
         try:
             cookies = json.loads(cookies)
         except TypeError:
-            print('Cookies不合法', username)
+            print('Cookies不合法', username, flush=True)
             self.cookies_db.delete(username)
-            print('删除Cookies', username)
+            print('删除Cookies', username, flush=True)
             return
         try:
 
@@ -90,23 +89,19 @@ class XiaohongshuValidTester(ValidTester):
 
             if response.status_code == 200:
                 if response.text.find('generatedTitle') > -1:
-                    print('Cookies有效', username)
+                    print('Cookies有效', username, flush=True)
                 else:
-                    print('Cookies失效', username)
+                    print('Cookies失效', username, flush=True)
                     self.cookies_db.delete(username)
-                    print('删除Cookies', username)
-                    print(response.status_code, response.headers)
-
-
+                    print('删除Cookies', username, flush=True)
+                    print(response.status_code, response.headers, flush=True)
             else:
-                print('Cookies失效', username)
+                print('Cookies失效', username, flush=True)
                 self.cookies_db.delete(username)
-                print('删除Cookies', username)
-
-
+                print('删除Cookies', username, flush=True)
 
         except ConnectionError as e:
-            print('发生异常', e.args)
+            print('发生异常', e.args, flush=True)
 
 
 if __name__ == '__main__':
