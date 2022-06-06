@@ -23,7 +23,7 @@ def send_request(url, headers, cookies):
     res = requests.get(url, headers, proxies=proxy, cookies=cookies, timeout=5)
     print('starting test request ..')
     if res.ok:
-        if response.text.find('datePublished') > -1:
+        if res.text.find('datePublished') > -1:
             return 'cool'
         else:
             raise KeyError('cookies has been outdated')
