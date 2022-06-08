@@ -3,6 +3,7 @@ import json
 from cookiespool.config import *
 from cookiespool.db import RedisClient
 from login.xiaohongshu.cookies import get_xiaohongshu_cookie
+from login.baijiaohao.cookies import get_baijiahao_cookie
 
 
 class CookiesGenerator(object):
@@ -72,6 +73,26 @@ class CookiesGenerator(object):
                 print('所有账号都已经成功获取Cookies', flush=True)
 
 
+class BaijiahaoCookiesGenerator(CookiesGenerator):
+    def __init__(self, website='baijiahao'):
+        """
+        初始化操作
+        :param website: 站点名称
+        :param browser: 使用的浏览器
+        """
+        CookiesGenerator.__init__(self, website)
+        self.website = website
+
+    def new_cookies(self, username, password):
+        """
+        生成Cookies
+        :param username: 用户名
+        :param password: 密码
+        :return: 用户名和Cookies
+        """
+        return asyncio.run(get_baijiahao_cookie(username, password))
+
+
 class XiaohongshuCookiesGenerator(CookiesGenerator):
     def __init__(self, website='xiaohongshu'):
         """
@@ -93,5 +114,5 @@ class XiaohongshuCookiesGenerator(CookiesGenerator):
 
 
 if __name__ == '__main__':
-    generator = XiaohongshuCookiesGenerator()
+    generator = BaijiahaoCookiesGenerator()
     generator.run()

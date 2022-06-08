@@ -18,17 +18,20 @@ BROWSER_TYPE = 'Chromium'
 
 # 产生器类，如扩展其他站点，请在此配置
 GENERATOR_MAP = {
+    'baijiahao': 'BaijiahaoCookiesGenerator',
     'xiaohongshu': 'XiaohongshuCookiesGenerator',
 }
 
 # 测试类，如扩展其他站点，请在此配置
 TESTER_MAP = {
+    'baijiahao': 'BaijiahaoValidTester',
     'xiaohongshu': 'XiaohongshuValidTester'
 }
 
 PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS', 'http://124.220.177.240:8425/random')
 
 TEST_URL_MAP = {
+    'baijiahao': 'https://me.mbd.baidu.com/r/Hp8ozn7Jmw?f=cp&u={}',
     'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/6270b07500000000210371b6?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}'
 }
 

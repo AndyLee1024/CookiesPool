@@ -104,5 +104,47 @@ class XiaohongshuValidTester(ValidTester):
             print('发生异常', e.args, flush=True)
 
 
+class BaijiahaoValidTester(ValidTester):
+    def __init__(self, website='baijiahao'):
+        ValidTester.__init__(self, website)
+
+    def test(self, username, cookies):
+        print('正在测试 baijiahao Cookies', '用户名', username, flush=True)
+        try:
+            cookies = json.loads(cookies)
+        except TypeError:
+            print('Cookies不合法', username, flush=True)
+            self.cookies_db.delete(username)
+            print('删除Cookies', username, flush=True)
+            return
+        try:
+
+            test_url = TEST_URL_MAP[self.website]
+            proxy = proxy_wrapper_for_requests()
+            response = requests.get('https://baijiahao.baidu.com/s?id=1734518047458590331', headers={
+                'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'User-Agent': generate_weixin_user_agent(),
+                'Referer': ''}, proxies=proxy, cookies=cookies, timeout=5,
+                                    allow_redirects=False)
+            if response.status_code == 200:
+
+                if response.text.find('titleSize') > -1:
+                    print('Cookies有效', username, flush=True)
+                else:
+                    print('Cookies失效', username, flush=True)
+                    self.cookies_db.delete(username)
+                    print('删除Cookies', username, flush=True)
+                    print(response.status_code, response.headers, flush=True)
+            else:
+                print('Cookies失效', username, flush=True)
+                self.cookies_db.delete(username)
+                print('删除Cookies', username, flush=True)
+
+        except ConnectionError as e:
+            print('发生异常', e.args, flush=True)
+
+
 if __name__ == '__main__':
-    XiaohongshuValidTester().run()
+    for i in range(0, 100):
+        BaijiahaoValidTester().run()
