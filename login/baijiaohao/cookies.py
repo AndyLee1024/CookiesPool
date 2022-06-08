@@ -110,10 +110,6 @@ async def get_baijiahao_cookie(username, password):
         await page.evaluateOnNewDocument(SET_CHROME_INFO)
         await page.evaluateOnNewDocument(CHANGE_PERMISSION)
 
-        await page.emulate(
-            options={'viewport': {'width': 390, 'height': 844, 'isMobile': True},
-                     'userAgent': generate_weixin_user_agent()})
-
         await page.goto(TEST_URL_MAP.get('baijiahao').format(int(time.time())))
         current_url = page.url
         if current_url.find('wappass') == -1:

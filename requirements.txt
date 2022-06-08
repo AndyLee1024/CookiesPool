@@ -6,3 +6,4 @@ random_user_agent==1.0.1
 pyppeteer==1.0.2
 ddddocr==1.4.3
 retrying
+termcolor

@@ -1,4 +1,6 @@
 import json
+import uuid
+
 import requests
 from requests.exceptions import ConnectionError
 from cookiespool.db import *
@@ -17,7 +19,7 @@ class ValidTester(object):
     def run(self):
         cookies_groups = self.cookies_db.all()
         if len(cookies_groups) == 0:
-            print('没有Cookies 无法进行测试', flush=True)
+            print(colored(f'{self.website} 没有Cookies 无法进行测试', 'red'), flush=True)
         for username, cookies in cookies_groups.items():
             self.test(username, cookies)
 
@@ -115,7 +117,6 @@ class BaijiahaoValidTester(ValidTester):
                 'Referer': test_url}, proxies=proxy, cookies=cookies, timeout=5,
                                     allow_redirects=False)
             if response.status_code == 200:
-
                 if response.text.find('ssr-content-wrapper') > -1:
                     print(colored('Cookies有效', 'green'), username, flush=True)
                 else:
