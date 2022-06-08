@@ -84,7 +84,7 @@ async def get_baijiahao_cookie(username, password):
     result = {
         'status': 3
     }
-    browser = await launch(headless=False, defaultViewport=None,
+    browser = await launch(headless=True, defaultViewport=None,
                            ignoreDefaultArgs=[
                                '--enable-automation'
                            ],
