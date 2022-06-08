@@ -2,21 +2,8 @@ import json
 import requests
 from requests.exceptions import ConnectionError
 from cookiespool.db import *
-from cookiespool.libs import proxy_wrapper_for_requests, generate_weixin_user_agent
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, OperatingSystem
-
-software_names = [SoftwareName.CHROME.value]
-operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
-
-user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems, limit=100)
-
-# Get list of user agents.
-user_agents = user_agent_rotator.get_user_agents()
-
-
-# Get Random User Agent String.
-
+from cookiespool.libs import proxy_wrapper_for_requests, get_user_agent, generate_weixin_user_agent
+from termcolor import colored
 
 class ValidTester(object):
     def __init__(self, website='default'):
@@ -40,7 +27,7 @@ class WeiboValidTester(ValidTester):
         ValidTester.__init__(self, website)
 
     def test(self, username, cookies):
-        print('正在测试Cookies', '用户名', username, flush=True)
+        print(colored('正在测试Cookies', 'red'), '用户名', username, flush=True)
         try:
             cookies = json.loads(cookies)
         except TypeError:
@@ -53,7 +40,7 @@ class WeiboValidTester(ValidTester):
             proxy = proxy_wrapper_for_requests()
             response = requests.get(test_url, proxies=proxy, cookies=cookies, timeout=5, allow_redirects=False)
             if response.status_code == 200:
-                print('Cookies有效', username, flush=True)
+                print(colored('Cookies有效', 'green'), username, flush=True)
             else:
                 print('Cookies失效', username, flush=True)
                 self.cookies_db.delete(username)
@@ -67,7 +54,7 @@ class XiaohongshuValidTester(ValidTester):
         ValidTester.__init__(self, website)
 
     def test(self, username, cookies):
-        print('正在测试Cookies', '用户名', username, flush=True)
+        print(colored('正在测试 xiaohongshu Cookies', 'yellow'), '用户名', username, flush=True)
         try:
             cookies = json.loads(cookies)
         except TypeError:
@@ -89,7 +76,7 @@ class XiaohongshuValidTester(ValidTester):
 
             if response.status_code == 200:
                 if response.text.find('generatedTitle') > -1:
-                    print('Cookies有效', username, flush=True)
+                    print(colored('Cookies有效', 'green'), username, flush=True)
                 else:
                     print('Cookies失效', username, flush=True)
                     self.cookies_db.delete(username)
@@ -109,7 +96,7 @@ class BaijiahaoValidTester(ValidTester):
         ValidTester.__init__(self, website)
 
     def test(self, username, cookies):
-        print('正在测试 baijiahao Cookies', '用户名', username, flush=True)
+        print(colored('正在测试 baijiahao Cookies', 'yellow'), '用户名', username, flush=True)
         try:
             cookies = json.loads(cookies)
         except TypeError:
@@ -121,16 +108,16 @@ class BaijiahaoValidTester(ValidTester):
 
             test_url = TEST_URL_MAP[self.website]
             proxy = proxy_wrapper_for_requests()
-            response = requests.get('https://baijiahao.baidu.com/s?id=1734518047458590331', headers={
+            response = requests.get(test_url, headers={
                 'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                'User-Agent': generate_weixin_user_agent(),
-                'Referer': ''}, proxies=proxy, cookies=cookies, timeout=5,
+                'User-Agent': get_user_agent(),
+                'Referer': test_url}, proxies=proxy, cookies=cookies, timeout=5,
                                     allow_redirects=False)
             if response.status_code == 200:
 
-                if response.text.find('titleSize') > -1:
-                    print('Cookies有效', username, flush=True)
+                if response.text.find('ssr-content-wrapper') > -1:
+                    print(colored('Cookies有效', 'green'), username, flush=True)
                 else:
                     print('Cookies失效', username, flush=True)
                     self.cookies_db.delete(username)

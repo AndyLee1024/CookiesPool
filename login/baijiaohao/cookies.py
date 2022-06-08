@@ -114,20 +114,16 @@ async def get_baijiahao_cookie(username, password):
             options={'viewport': {'width': 390, 'height': 844, 'isMobile': True},
                      'userAgent': generate_weixin_user_agent()})
 
-        uuid_md5 = hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()
-        url = TEST_URL_MAP.get('baijiahao').format(uuid_md5)
-        await page.goto(url)
-        print('testing url -> {}'.format(url))
+        await page.goto(TEST_URL_MAP.get('baijiahao').format(int(time.time())))
         current_url = page.url
         if current_url.find('wappass') == -1:
             result['status'] = 1
             result['content'] = await page.cookies()
 
-        print('Successful to get cookies', result)
     finally:
         await browser.close()
+        print('Successful to get cookies', result)
         return result
-
 
 
 if __name__ == '__main__':
