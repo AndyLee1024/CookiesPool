@@ -5,7 +5,7 @@ REDIS_HOST = os.environ.get('REDIS_HOST', '124.220.177.240')
 
 # 目前支持的平台类型
 
-PLATFORM = ['weibo', 'xiaohongshu', 'toutiao', 'zhihu', 'baidu']
+PLATFORM = ['weibo', 'xiaohongshu', 'baijiahao']
 
 # Redis端口
 REDIS_PORT = os.environ.get('REDIS_PORT', '33479')

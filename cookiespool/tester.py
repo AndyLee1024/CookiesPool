@@ -7,6 +7,7 @@ from cookiespool.db import *
 from cookiespool.libs import proxy_wrapper_for_requests, get_user_agent, generate_weixin_user_agent
 from termcolor import colored
 
+
 class ValidTester(object):
     def __init__(self, website='default'):
         self.website = website
@@ -107,7 +108,6 @@ class BaijiahaoValidTester(ValidTester):
             print('删除Cookies', username, flush=True)
             return
         try:
-
             test_url = TEST_URL_MAP[self.website]
             proxy = proxy_wrapper_for_requests()
             response = requests.get(test_url, headers={
@@ -134,5 +134,4 @@ class BaijiahaoValidTester(ValidTester):
 
 
 if __name__ == '__main__':
-    for i in range(0, 100):
-        BaijiahaoValidTester().run()
+    BaijiahaoValidTester().run()

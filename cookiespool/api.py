@@ -18,7 +18,7 @@ def get_conn():
     获取
     :return:
     """
-    for website in GENERATOR_MAP:
+    for website in PLATFORM:
         print(website)
         if not hasattr(g, website):
             setattr(g, website + '_cookies', eval('RedisClient' + '("cookies", "' + website + '")'))
