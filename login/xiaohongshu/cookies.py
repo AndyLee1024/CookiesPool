@@ -81,6 +81,10 @@ CHANGE_PERMISSION = '''() => {
 
 
 async def get_xiaohongshu_cookie(username, password):
+    result = {
+        'status': 3
+    }
+
     browser = await launch(headless=True, defaultViewport=None,
                            ignoreDefaultArgs=[
                                '--enable-automation'
@@ -96,44 +100,47 @@ async def get_xiaohongshu_cookie(username, password):
                                  '--allow-no-sandbox-job',
                                  '--allow-outdated-plugins',
                                  '--disable-gpu'])
-    context = await browser.createIncognitoBrowserContext()
-    page = await context.newPage()
-    await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
-    await page.evaluateOnNewDocument(EXTEND_LANGUAGES)
-    await page.evaluateOnNewDocument(EXTEND_PLUGINS)
-    await page.evaluateOnNewDocument(EXTEND_MIME_TYPES)
-    await page.evaluateOnNewDocument(CHANGE_WEBGL)
-    await page.evaluateOnNewDocument(SET_CHROME_INFO)
-    await page.evaluateOnNewDocument(CHANGE_PERMISSION)
+    try:
+        context = await browser.createIncognitoBrowserContext()
+        page = await context.newPage()
+        await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
+        await page.evaluateOnNewDocument(EXTEND_LANGUAGES)
+        await page.evaluateOnNewDocument(EXTEND_PLUGINS)
+        await page.evaluateOnNewDocument(EXTEND_MIME_TYPES)
+        await page.evaluateOnNewDocument(CHANGE_WEBGL)
+        await page.evaluateOnNewDocument(SET_CHROME_INFO)
+        await page.evaluateOnNewDocument(CHANGE_PERMISSION)
 
-    await page.emulate(
-        options={'viewport': {'width': 390, 'height': 844, 'isMobile': True},
-                 'userAgent': generate_weixin_user_agent()})
-    await page.goto(TEST_URL_MAP.get('xiaohongshu').format(int(time.time())))
+        await page.emulate(
+            options={'viewport': {'width': 390, 'height': 844, 'isMobile': True},
+                     'userAgent': generate_weixin_user_agent()})
+        await page.goto(TEST_URL_MAP.get('xiaohongshu').format(int(time.time())))
 
-    for i in range(0, 2):
-        print(page.url)
-        await asyncio.sleep(4)
+        for i in range(0, 2):
+            print(page.url)
+            await asyncio.sleep(4)
 
-        captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
+            captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
 
-        print(f'captcha status {captcha}')
-        if captcha is None:
-            break
-        else:
-            await slide(page, captcha)
-            await asyncio.sleep(3)
+            print(f'captcha status {captcha}')
+            if captcha is None:
+                break
+            else:
+                await slide(page, captcha)
+                await asyncio.sleep(3)
 
-    current_url = page.url
-    result = {
-        'status': 3
-    }
-    if current_url.find('captcha') == -1:
-        result['status'] = 1
-        result['content'] = await page.cookies()
-    await browser.close()
-    print('Successful to get cookies', result)
-    return result
+        current_url = page.url
+
+        if current_url.find('captcha') == -1:
+            result['status'] = 1
+            result['content'] = await page.cookies()
+
+    except Exception as err:
+        print('got exception {}'.format(err), flush=True)
+    finally:
+        await browser.close()
+        print('Successful to get cookies', result)
+        return result
 
 
 async def slide(pageObject, captchaObject):
