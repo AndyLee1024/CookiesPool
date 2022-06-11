@@ -18,7 +18,7 @@ BROWSER_TYPE = 'Chromium'
 
 # 产生器类，如扩展其他站点，请在此配置
 GENERATOR_MAP = {
-    'baijiahao': 'BaijiahaoCookiesGenerator',
+  #  'baijiahao': 'BaijiahaoCookiesGenerator',
     'xiaohongshu': 'XiaohongshuCookiesGenerator',
 }
 
@@ -40,7 +40,7 @@ CYCLE = 120
 
 # API地址和端口
 API_HOST = '0.0.0.0'
-API_PORT = 5022
+API_PORT = 5021
 
 # 产生器开关，模拟登录添加Cookies
 GENERATOR_PROCESS = True
