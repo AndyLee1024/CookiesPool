@@ -3,7 +3,7 @@ import os
 import time
 
 from pyppeteer import launch
-import ddddocr
+# import ddddocr
 import random
 from cookiespool.libs import get_random_proxy, download_image, get_trajectory_1, generate_weixin_user_agent
 from cookiespool.config import TEST_URL_MAP
@@ -84,23 +84,22 @@ async def get_xiaohongshu_cookie(username, password):
     result = {
         'status': 3
     }
-
-    browser = await launch(headless=True, defaultViewport=None,
-                           ignoreDefaultArgs=[
-                               '--enable-automation'
-                           ],
-                           args=['--disable-infobars',
-                                 '--no-sandbox',
-                                 '--disable-setuid-sandbox',
-                                 '--password-store=basic',
-                                 '--account-consistency',
-                                 '--aggressive',
-                                 '--proxy-server={}'.format(get_random_proxy()),
-                                 '--allow-running-insecure-content',
-                                 '--allow-no-sandbox-job',
-                                 '--allow-outdated-plugins',
-                                 '--disable-gpu'])
     try:
+        browser = await launch(headless=True, defaultViewport=None,
+                               ignoreDefaultArgs=[
+                                   '--enable-automation'
+                               ],
+                               args=['--disable-infobars',
+                                     '--no-sandbox',
+                                     '--disable-setuid-sandbox',
+                                     '--password-store=basic',
+                                     '--account-consistency',
+                                     '--aggressive',
+                                     '--proxy-server={}'.format(get_random_proxy()),
+                                     '--allow-running-insecure-content',
+                                     '--allow-no-sandbox-job',
+                                     '--allow-outdated-plugins',
+                                     '--disable-gpu'])
         context = await browser.createIncognitoBrowserContext()
         page = await context.newPage()
         await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
@@ -116,75 +115,75 @@ async def get_xiaohongshu_cookie(username, password):
                      'userAgent': generate_weixin_user_agent()})
         await page.goto(TEST_URL_MAP.get('xiaohongshu').format(int(time.time())))
 
-        for i in range(0, 2):
-            print(page.url)
-            await asyncio.sleep(4)
-
-            captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
-
-            print(f'captcha status {captcha}')
-            if captcha is None:
-                break
-            else:
-                await slide(page, captcha)
-                await asyncio.sleep(3)
+        # for i in range(0, 2):
+        #     print(page.url)
+        #     await asyncio.sleep(4)
+        #
+        #     captcha = await page.querySelector('.shumei_captcha_loaded_img_bg')
+        #
+        #     print(f'captcha status {captcha}')
+        #     if captcha is None:
+        #         break
+        #     else:
+        #         await slide(page, captcha)
+        #         await asyncio.sleep(3)
 
         current_url = page.url
 
         if current_url.find('captcha') == -1:
             result['status'] = 1
             result['content'] = await page.cookies()
+        await browser.close()
 
     except Exception as err:
-        print('got exception {}'.format(err), flush=True)
+        print('got exception -> {}'.format(err), flush=True)
     finally:
-        await browser.close()
         print('Successful to get cookies', result)
         return result
 
 
-async def slide(pageObject, captchaObject):
-    page = pageObject
-    background_src = await page.evaluate('(captcha) => captcha.getAttribute("src")', captchaObject)
-    target = await page.J('.shumei_captcha_loaded_img_fg')
-    target_src = await page.evaluate('(target) => target.getAttribute("src")', target)
-    print('发现验证码', background_src, target_src)
-    if background_src is not None and target_src is not None:
-        background_image = download_image(background_src)
-        target_image = download_image(target_src)
-        det = ddddocr.DdddOcr(det=False, ocr=False, show_ad=False)
-
-        with open(target_image, 'rb') as f:
-            target_bytes = f.read()
-
-        with open(background_image, 'rb') as f:
-            background_bytes = f.read()
-
-        res = det.slide_match(target_bytes, background_bytes)
-
-        os.remove(target_image)
-        os.remove(background_image)
-
-        btn = await page.J('.shumei_captcha_slide_btn')
-        handle = await btn.boundingBox()
-
-        handleX = handle.get('x') + handle.get('width') / 2
-        handleY = handle.get('y') + handle.get('height') / 2
-        await asyncio.sleep(random.uniform(0.1, 0.6))
-
-        random_zoom = random.uniform(0.666666, 0.6666)
-        x = (res.get('target')[0]) * random_zoom
-        trajectories = get_trajectory_1(x)
-
-        await page.mouse.move(handleX, handleY)
-        await page.mouse.down()
-
-        for trajectory in trajectories[0]:
-            print(trajectory[0] + handleX, trajectory[1] + handleY, trajectory[2])
-            await page.mouse.move(trajectory[0] + handleX, trajectory[1] + handleY,
-                                  options={'steps': random.randint(10, 30)})
-        await page.mouse.up()
-        await asyncio.sleep(1)
+# async def slide(pageObject, captchaObject):
+#     page = pageObject
+#     background_src = await page.evaluate('(captcha) => captcha.getAttribute("src")', captchaObject)
+#     target = await page.J('.shumei_captcha_loaded_img_fg')
+#     target_src = await page.evaluate('(target) => target.getAttribute("src")', target)
+#     print('发现验证码', background_src, target_src)
+#     if background_src is not None and target_src is not None:
+#         background_image = download_image(background_src)
+#         target_image = download_image(target_src)
+#         det = ddddocr.DdddOcr(det=False, ocr=False, show_ad=False)
+#
+#         with open(target_image, 'rb') as f:
+#             target_bytes = f.read()
+#
+#         with open(background_image, 'rb') as f:
+#             background_bytes = f.read()
+#
+#         res = det.slide_match(target_bytes, background_bytes)
+#
+#         os.remove(target_image)
+#         os.remove(background_image)
+#
+#         btn = await page.J('.shumei_captcha_slide_btn')
+#         handle = await btn.boundingBox()
+#
+#         handleX = handle.get('x') + handle.get('width') / 2
+#         handleY = handle.get('y') + handle.get('height') / 2
+#         await asyncio.sleep(random.uniform(0.1, 0.6))
+#
+#         random_zoom = random.uniform(0.666666, 0.6666)
+#         x = (res.get('target')[0]) * random_zoom
+#         trajectories = get_trajectory_1(x)
+#
+#         await page.mouse.move(handleX, handleY)
+#         await page.mouse.down()
+#
+#         for trajectory in trajectories[0]:
+#             print(trajectory[0] + handleX, trajectory[1] + handleY, trajectory[2])
+#             await page.mouse.move(trajectory[0] + handleX, trajectory[1] + handleY,
+#                                   options={'steps': random.randint(10, 30)})
+#         await page.mouse.up()
+#         await asyncio.sleep(1)
 
 
 if __name__ == '__main__':

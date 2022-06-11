@@ -32,7 +32,7 @@ PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS', 'http://124.220.177.240:84
 
 TEST_URL_MAP = {
     'baijiahao': 'https://baijiahao.baidu.com/s?id=1726177837224647818&wfr=spider&for=pc',
-    'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/6270b07500000000210371b6?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}'
+    'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628c4c5000000000210356b9?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}'
 }
 
 # 产生器和验证器循环周期
