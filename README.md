@@ -1,7 +1,14 @@
 # CookiesPool
 
-可扩展的Cookies池，目前对接了新浪微博，[m.weibo.cn](https://m.weibo.cn)，可自行扩展其他站点
+可扩展的Cookies池，目前对接了百家号，小红书，可自行扩展其他站点
 
+## API server 生产环境部署
+
+建议使用systemd + gunicorn 
+
+```
+gunicorn -w 4 --bind 0.0.0.0:5021 wsgi:app
+```
 
 ## 安装
 
@@ -63,16 +70,11 @@ VALID_PROCESS = True
 API_PROCESS = True
 ```
 
-
-## 账号购买
-
-账号可在淘宝购买
-
-
 ## 导入账号
 
+如小红书
 ```
-python3 importer.py
+python3 importer.py xiaohongshu
 ```
 
 ```
@@ -129,3 +131,4 @@ Cookies检测完成
 成功获取到Cookies {'SUHB': '08J77UIj4w5n_T', 'SCF': 'AimcUCUVvHjswSBmTswKh0g4kNj4K7_U9k57YzxbqFt4SFBhXq3Lx4YSNO9VuBV841BMHFIaH4ipnfqZnK7W6Qs.', 'SSOLoginState': '1501439488', '_T_WM': '99b7d656220aeb9207b5db97743adc02', 'M_WEIBOCN_PARAMS': 'uicode%3D20000174', 'SUB': '_2A250elZQDeRhGeBM6VAR8ifEzTuIHXVXhXoYrDV6PUJbkdBeLXTxkW17ZoYhhJ92N_RGCjmHpfv9TB8OJQ..'}
 成功保存Cookies
 ```
+

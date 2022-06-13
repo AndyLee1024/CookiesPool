@@ -16,7 +16,7 @@ EXTEND_PLUGINS = '''() => {Object.defineProperty(navigator, 'plugins', {get: () 
 EXTEND_MIME_TYPES = '''() => {Object.defineProperty(navigator, 'mimeTypes', {get: () => [0, 1, 2, 3, 4]})}'''
 CHANGE_WEBGL = '''() => {
     const getParameter = WebGLRenderingContext.getParameter
-    WebGLRenderingContext.prototype.getParameter = (parameter) => {
+    WebGLRenderingContext.prototype.getParameter = (parameter) => {gunicorn 
       if (parameter === 37445) {
         return 'Intel Open Source Technology Center'
       }
@@ -84,24 +84,27 @@ async def get_baijiahao_cookie(username, password):
     result = {
         'status': 3
     }
-    browser = await launch(headless=True, defaultViewport=None,
-                           ignoreDefaultArgs=[
-                               '--enable-automation'
-                           ],
-                           args=['--disable-infobars',
-                                 '--no-sandbox',
-                                 '--disable-setuid-sandbox',
-                                 '--password-store=basic',
-                                 '--account-consistency',
-                                 '--aggressive',
-                                 '--proxy-server={}'.format(get_random_proxy()),
-                                 '--allow-running-insecure-content',
-                                 '--allow-no-sandbox-job',
-                                 '--allow-outdated-plugins',
-                                 '--disable-gpu'])
-    context = await browser.createIncognitoBrowserContext()
-    page = await context.newPage()
+
     try:
+        browser = await launch(headless=False, defaultViewport=None,
+                               ignoreDefaultArgs=[
+                                   '--enable-automation'
+                               ],
+                               args=['--disable-infobars',
+                                     '--no-sandbox',
+                                     '--blink-settings=imagesEnabled=false',
+                                     '--disable-setuid-sandbox',
+                                     '--password-store=basic',
+                                     '--account-consistency',
+                                     '--aggressive',
+                                     '--proxy-server={}'.format(get_random_proxy()),
+                                     '--allow-running-insecure-content',
+                                     '--allow-no-sandbox-job',
+                                     '--allow-outdated-plugins',
+                                     '--disable-gpu'])
+        context = await browser.createIncognitoBrowserContext()
+        page = await context.newPage()
+
         await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
         await page.evaluateOnNewDocument(EXTEND_LANGUAGES)
         await page.evaluateOnNewDocument(EXTEND_PLUGINS)
