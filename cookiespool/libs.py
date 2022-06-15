@@ -5,6 +5,26 @@ import mimetypes
 import random
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, OperatingSystem
+import base64
+import hashlib
+
+def x96_b64encode(in_put: str) -> str:
+    in_put = in_put.encode('utf-8')
+    while len(in_put) % 3 != 0:
+        in_put += bytes([0])
+
+    table1 = list('RuPtXwxpThIZ0qyz_9fYLCOV8B1mMGKs7UnFHgN3iDaWAJE-Qrk2ecSo6bjd4vl5')
+    table2 = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/')
+    table3 = {table2[v]: table1[v] for v in range(len(table1))}
+
+    b64_in = bytearray()
+    for i in range(len(in_put) - 1, 0, -3):
+        b64_in += in_put[i - 2: i + 1]
+    for i in range(0, len(b64_in), 12):
+        b64_in[i + 2], b64_in[i + 4], b64_in[i + 6] = b64_in[i + 2] ^ 42, b64_in[i + 4] ^ 42, b64_in[i + 6] ^ 42
+
+    b64_out = ''.join(list(map(lambda n: table3[n], list(base64.b64encode(b64_in).decode()))))
+    return ''.join([b64_out[i: i + 4][::-1] for i in range(0, len(b64_out), 4)])
 
 
 def get_user_agent():

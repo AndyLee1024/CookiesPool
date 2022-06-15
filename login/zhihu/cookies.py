@@ -1,33 +1,129 @@
+import asyncio
+import os
 import time
+import hashlib
+import uuid
 
-import requests
-
+from pyppeteer import launch
+from cookiespool.libs import get_random_proxy
 from cookiespool.config import TEST_URL_MAP
-from cookiespool.libs import get_user_agent, get_random_proxy
+
+HIDE_WEBDRIVER = '''() => {Object.defineProperty(navigator, 'webdriver', {get: () => undefined})}'''
+SET_USER_AGENT = '''() => {Object.defineProperty(navigator, 'userAgent', {get: () => '%s'})}'''
+SET_APP_VERSION = '''() => {Object.defineProperty(navigator, 'appVersion', {get: () => '5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'})}'''
+EXTEND_LANGUAGES = '''() => {Object.defineProperty(navigator, 'languages', {get: () => ['zh-CN', 'zh', 'en', 'zh-TW', 'ja']})}'''
+EXTEND_PLUGINS = '''() => {Object.defineProperty(navigator, 'plugins', {get: () => [0, 1, 2, 3, 4]})}'''
+EXTEND_MIME_TYPES = '''() => {Object.defineProperty(navigator, 'mimeTypes', {get: () => [0, 1, 2, 3, 4]})}'''
+CHANGE_WEBGL = '''() => {
+    const getParameter = WebGLRenderingContext.getParameter
+    WebGLRenderingContext.prototype.getParameter = (parameter) => {gunicorn 
+      if (parameter === 37445) {
+        return 'Intel Open Source Technology Center'
+      }
+      if (parameter === 37446) {
+        return 'Mesa DRI Intel(R) Ivybridge Mobile '
+      }
+      return getParameter(parameter)
+    }
+  }
+'''
+SET_CHROME_INFO = '''() => {
+  Object.defineProperty(window, 'chrome', {
+    "app": {
+      "isInstalled": false,
+      "InstallState": {"DISABLED": "disabled", "INSTALLED": "installed", "NOT_INSTALLED": "not_installed"},
+      "RunningState": {"CANNOT_RUN": "cannot_run", "READY_TO_RUN": "ready_to_run", "RUNNING": "running"}
+    },
+    "runtime": {
+      "OnInstalledReason": {
+        "CHROME_UPDATE": "chrome_update",
+        "INSTALL": "install",
+        "SHARED_MODULE_UPDATE": "shared_module_update",
+        "UPDATE": "update"
+      },
+      "OnRestartRequiredReason": {"APP_UPDATE": "app_update", "OS_UPDATE": "os_update", "PERIODIC": "periodic"},
+      "PlatformArch": {
+        "ARM": "arm",
+        "ARM64": "arm64",
+        "MIPS": "mips",
+        "MIPS64": "mips64",
+        "X86_32": "x86-32",
+        "X86_64": "x86-64"
+      },
+      "PlatformNaclArch": {"ARM": "arm", "MIPS": "mips", "MIPS64": "mips64", "X86_32": "x86-32", "X86_64": "x86-64"},
+      "PlatformOs": {
+        "ANDROID": "android",
+        "CROS": "cros",
+        "LINUX": "linux",
+        "MAC": "mac",
+        "OPENBSD": "openbsd",
+        "WIN": "win"
+      },
+      "RequestUpdateCheckStatus": {
+        "NO_UPDATE": "no_update",
+        "THROTTLED": "throttled",
+        "UPDATE_AVAILABLE": "update_available"
+      }
+    }
+  })
+}
+'''
+
+CHANGE_PERMISSION = '''() => {
+  const originalQuery = window.navigator.permissions.query;
+  return window.navigator.permissions.query = (parameters) => (
+    parameters.name === 'notifications' ?
+      Promise.resolve({ state: Notification.permission }) :
+      originalQuery(parameters)
+  )
+}
+'''
 
 
-def get_zhihu_cookie(username, password):
+async def get_zhihu_cookie(username, password):
     result = {
         'status': 3
     }
+
     try:
-        headers = {
-            "referer": "https://www.zhihu.com/search?type=content&q=python&utm_content=search_preset",
-            "user-agent": get_user_agent(),
-        }
-        proxies = {
-            'http': f'http://{get_random_proxy()}',
-        }
-        res = requests.post(TEST_URL_MAP.get('zhihu'), headers=headers, proxies=proxies)
-        if res.status_code == 200:
+        browser = await launch(headless=False, defaultViewport=None,
+                               ignoreDefaultArgs=[
+                                   '--enable-automation'
+                               ],
+                               args=['--disable-infobars',
+                                     '--no-sandbox',
+                                     '--blink-settings=imagesEnabled=false',
+                                     '--disable-setuid-sandbox',
+                                     '--password-store=basic',
+                                     '--account-consistency',
+                                     '--aggressive',
+                                     '--proxy-server={}'.format(get_random_proxy()),
+                                     '--allow-running-insecure-content',
+                                     '--allow-no-sandbox-job',
+                                     '--allow-outdated-plugins',
+                                     '--disable-gpu'])
+        context = await browser.createIncognitoBrowserContext()
+        page = await context.newPage()
+
+        await page.evaluateOnNewDocument(HIDE_WEBDRIVER)
+        await page.evaluateOnNewDocument(EXTEND_LANGUAGES)
+        await page.evaluateOnNewDocument(EXTEND_PLUGINS)
+        await page.evaluateOnNewDocument(EXTEND_MIME_TYPES)
+        await page.evaluateOnNewDocument(CHANGE_WEBGL)
+        await page.evaluateOnNewDocument(SET_CHROME_INFO)
+        await page.evaluateOnNewDocument(CHANGE_PERMISSION)
+
+        await page.goto(TEST_URL_MAP.get('zhihu').format(int(time.time())))
+        current_url = page.url
+        if current_url.find('signin?next') == -1:
             result['status'] = 1
-            result['content'] = f'"{res.text}|{int(time.time())}";'
-    except Exception as e:
-        print('got exception -> {}'.format(e), flush=True)
+            result['content'] = await page.cookies()
+
     finally:
+        await browser.close()
         print('Successful to get cookies', result)
         return result
 
 
 if __name__ == '__main__':
-    get_zhihu_cookie(username='test', password='test')
+    asyncio.run(get_zhihu_cookie('test', 'test'))

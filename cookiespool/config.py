@@ -5,7 +5,7 @@ REDIS_HOST = os.environ.get('REDIS_HOST', '124.220.177.240')
 
 # 目前支持的平台类型
 
-PLATFORM = ['weibo', 'xiaohongshu', 'baijiahao']
+PLATFORM = ['weibo', 'xiaohongshu', 'zhihu', 'baijiahao']
 
 # Redis端口
 REDIS_PORT = os.environ.get('REDIS_PORT', '33479')
@@ -35,7 +35,7 @@ PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS', 'http://124.220.177.240:84
 TEST_URL_MAP = {
     'baijiahao': 'https://baijiahao.baidu.com/s?id=1726177837224647818&wfr=spider&for=pc',
     'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628c4c5000000000210356b9?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}',
-    'zhihu': 'https://www.zhihu.com/udid'
+    'zhihu': 'https://www.zhihu.com/search?type=content&q=vw%20id6x'
 }
 
 # 产生器和验证器循环周期
