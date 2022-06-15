@@ -3,7 +3,7 @@ import time
 import requests
 
 from cookiespool.config import TEST_URL_MAP
-from cookiespool.libs import get_user_agent
+from cookiespool.libs import get_user_agent, get_random_proxy
 
 
 def get_zhihu_cookie(username, password):
@@ -15,7 +15,10 @@ def get_zhihu_cookie(username, password):
             "referer": "https://www.zhihu.com/search?type=content&q=python&utm_content=search_preset",
             "user-agent": get_user_agent(),
         }
-        res = requests.post(TEST_URL_MAP.get('zhihu'), headers=headers)
+        proxies = {
+            'http': f'http://{get_random_proxy()}',
+        }
+        res = requests.post(TEST_URL_MAP.get('zhihu'), headers=headers, proxies=proxies)
         if res.status_code == 200:
             result['status'] = 1
             result['content'] = f'"{res.text}|{int(time.time())}";'
