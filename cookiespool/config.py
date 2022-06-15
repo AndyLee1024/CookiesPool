@@ -18,21 +18,24 @@ BROWSER_TYPE = 'Chromium'
 
 # 产生器类，如扩展其他站点，请在此配置
 GENERATOR_MAP = {
-  #  'baijiahao': 'BaijiahaoCookiesGenerator',
+    #  'baijiahao': 'BaijiahaoCookiesGenerator',
     'xiaohongshu': 'XiaohongshuCookiesGenerator',
+    'zhihu': 'ZhihuCookiesGenerator',
 }
 
 # 测试类，如扩展其他站点，请在此配置
 TESTER_MAP = {
     'baijiahao': 'BaijiahaoValidTester',
-    'xiaohongshu': 'XiaohongshuValidTester'
+    'xiaohongshu': 'XiaohongshuValidTester',
+    'zhihu': 'ZhihuValidTester'
 }
 
 PROXY_POOL_URL = os.environ.get('PROXY_POOL_ADDRESS', 'http://124.220.177.240:8425/random')
 
 TEST_URL_MAP = {
     'baijiahao': 'https://baijiahao.baidu.com/s?id=1726177837224647818&wfr=spider&for=pc',
-    'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628c4c5000000000210356b9?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}'
+    'xiaohongshu': 'https://www.xiaohongshu.com/discovery/item/628c4c5000000000210356b9?share_from_user_hidden=true&xhsshare=WeixinSession&appuid=6246c2cf000000001000d6f2&apptime={}',
+    'zhihu': 'https://www.zhihu.com/udid'
 }
 
 # 产生器和验证器循环周期
